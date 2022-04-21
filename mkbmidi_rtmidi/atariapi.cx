@@ -1,0 +1,319 @@
+#include <stdio.h>
+#include <tos.h>
+#include "typedefs.h"
+
+UINT8 GetMidiByteXX(void);
+char GetMidiByteReadyXX(void);
+INT32 MidiLongMSG_Send(UINT8 *ExData, UINT32 ExSize);
+UINT32 MidiLongMSG_Get(UINT8 *ExData);
+
+static int	n=0;
+IOREC *ior;
+static char	gb[200]; /* 200 letzte empfangene bytes */
+
+#define __local_midi_atariapi
+#include "atariapi.h"
+#undef  __local_midi_atariapi
+
+typedef struct tag_MidiBuffer {
+   UINT8  sysex_buffer[512];
+   UINT32 sysexsize;
+   UINT32 ShortMsg;
+   UINT8  ShortSize;
+   UINT8  LastCmd;
+} t_MidiBuffer;
+      
+UINT8  sysexvalid;
+
+t_MidiBuffer MidiBuffer;
+
+/*****************************************************************************
+ * Debugging
+ *****************************************************************************/
+
+extern int   DebugMode;
+#define LOCAL_DEBUG 0
+
+/*****************************************************************************
+ * Low level definitions
+ *****************************************************************************/
+
+#define MIDI_BEGINSYSEX 0xF0
+
+INT32 MidiLongMSG_Send(UINT8 *ExData, UINT32 ExSize)
+{
+   Midiws((int)(ExSize-1),ExData);
+   return(0);
+}   
+
+UINT32 MidiLongMSG_Get(UINT8 *ExData)
+{
+   UINT32 i;
+   if (sysexvalid!=0)
+   {
+      for(i=0; i<MidiBuffer.sysexsize; i++)
+      {
+         *(ExData+i)=MidiBuffer.sysex_buffer[i];
+      }
+      sysexvalid=0;
+      return(MidiBuffer.sysexsize);
+   }
+   return(0);
+}   
+
+INT32 MidiShortMSG_Send(UINT32 msg);
+INT32 MidiShortMSG_Send(UINT32 msg)
+{
+   UINT8 c1[3];
+   if((msg & 0xc0) == 0x80) /* 80-d0 */ 
+   {
+      c1[0] = msg;
+      c1[1] = msg >> 8;
+      c1[2] = msg >> 16;
+      Midiws(2,c1);
+   }
+   if((msg & 0xc0) == 0xc0) /* c0-d0 */ 
+   {
+      c1[0] = msg;
+      c1[1] = msg >> 8;
+      Midiws(1,c1);
+   }
+   return(0);
+}
+
+
+UINT32 MidiShortMSG_Get(void);
+UINT32 MidiShortMSG_Get(void)
+{
+   UINT8 cmd;
+   UINT32 cmd32;
+
+   while (GetMidiByteReadyXX() != 0)
+   {
+      cmd=GetMidiByteXX();
+      cmd32=(UINT32)cmd;
+#if (LOCAL_DEBUG==2)
+      printf(">%x %lx\n", cmd, cmd32);
+#endif
+      if ((cmd & 0x80) == 0x80)
+      {  
+         if ((cmd & 0xf0) == 0xf0)
+         {
+            if (cmd == 0xf0) /* Sysex */
+            {
+               MidiBuffer.ShortSize=0xff;
+               MidiBuffer.sysexsize=0;
+               sysexvalid=0;
+               #if (LOCAL_DEBUG==1)
+                  printf("Sysex Start\n");
+               #endif
+            }
+            else if (cmd == 0xf7) /* Sysex End */
+            {
+               #if (LOCAL_DEBUG==1)
+                  printf("Sysex End\n");
+               #endif
+               if(MidiBuffer.ShortSize==0xff)
+               {
+                  MidiBuffer.ShortSize=0xfe;
+               }
+            }
+         }
+         else /* Rest */
+         {
+            MidiBuffer.ShortSize=0;
+            MidiBuffer.LastCmd=cmd;
+            MidiBuffer.ShortMsg = cmd32;
+         }
+      }
+
+      switch(MidiBuffer.ShortSize)
+      {
+         case 0xfe:
+            MidiBuffer.sysex_buffer[MidiBuffer.sysexsize]=cmd;
+            MidiBuffer.sysexsize++;
+            sysexvalid=1;
+#if (LOCAL_DEBUG==1)
+            printf("Sysex fe: 1:%lx %x %x %x\n",MidiBuffer.sysexsize, MidiBuffer.sysex_buffer[0], MidiBuffer.sysex_buffer[1], MidiBuffer.sysex_buffer[2]);
+#endif
+            break;
+         case 0xff:
+            MidiBuffer.sysex_buffer[MidiBuffer.sysexsize]=cmd;
+            MidiBuffer.sysexsize++;
+#if (LOCAL_DEBUG==2)
+            printf("Sysex ff: 1:%lx %x %x %x\n",MidiBuffer.sysexsize, MidiBuffer.sysex_buffer[0], MidiBuffer.sysex_buffer[1], MidiBuffer.sysex_buffer[2]);
+#endif
+            break;
+         case 0:
+         	MidiBuffer.ShortSize++;
+#if (LOCAL_DEBUG==1)
+            printf("->%d %lx %lx\n",MidiBuffer.ShortSize, cmd32, MidiBuffer.ShortMsg);
+#endif
+            break;
+         case 1:
+            MidiBuffer.ShortMsg = ((MidiBuffer.ShortMsg & 0xffff00ffl) | (cmd32 << 8));
+#if (LOCAL_DEBUG==1)
+            printf("-->%d %lx %lx\n",MidiBuffer.ShortSize, cmd32, MidiBuffer.ShortMsg);
+#endif
+            if ((MidiBuffer.LastCmd & 0xe0) == 0xc0)
+            {
+               MidiBuffer.ShortSize=1;
+               return(MidiBuffer.ShortMsg);
+            }
+            MidiBuffer.ShortSize++;
+            break;
+         case 2:
+            MidiBuffer.ShortMsg = ((MidiBuffer.ShortMsg & 0xff00ffffl) | (cmd32 << 16));
+#if (LOCAL_DEBUG==1)
+            printf("--->%d %lx %lx\n",MidiBuffer.ShortSize, cmd32, MidiBuffer.ShortMsg);
+#endif
+         	MidiBuffer.ShortSize = 0;
+            if (     ((MidiBuffer.LastCmd & 0x80) == 0x80) 
+                 ||  ((MidiBuffer.LastCmd       ) == 0xe0)
+               )
+            {
+               MidiBuffer.ShortSize=1;
+               return(MidiBuffer.ShortMsg);
+            }
+            MidiBuffer.ShortSize=1;
+         break;
+         default:
+         break;
+      }
+   }
+   return(0xffffffffl);
+}   
+
+#ifdef NIE
+UINT32 MidiShortMSG_GetXX(void);
+UINT32 MidiShortMSG_GetXX(void)
+{
+   UINT8 cmd;
+   UINT32 cmd32;
+
+   while (GetMidiByteReadyXX() != 0)
+   {
+      cmd=GetMidiByteXX();
+      cmd32=(UINT32)cmd;
+#if (LOCAL_DEBUG==1)
+      printf(">%x %lx\n", cmd, cmd32);
+#endif
+      if ((cmd & 0x80) == 0x80)
+      {  
+         if ((cmd & 0xf0) == 0xf0) /* Sysex */
+         {
+            MidiBuffer.ShortSize=0xff;
+            MidiBuffer.sysexsize=0;
+            MidiBuffer.sysex_buffer[MidiBuffer.sysexsize]=cmd;
+            MidiBuffer.sysexsize++;
+         }
+         else /* Rest */
+         {
+            MidiBuffer.ShortSize=0;
+            MidiBuffer.LastCmd=cmd;
+            MidiBuffer.ShortMsg = cmd32;
+         }
+      }
+
+      switch(MidiBuffer.ShortSize)
+      {
+         case 0xff:
+            return(0xffffffffl);
+            break;
+         case 0:
+         	MidiBuffer.ShortSize++;
+#if (LOCAL_DEBUG==1)
+            printf("->%d %lx %lx\n",MidiBuffer.ShortSize, cmd32, MidiBuffer.ShortMsg);
+#endif
+            return(0xffffffffl);
+            break;
+         case 1:
+            MidiBuffer.ShortMsg = ((MidiBuffer.ShortMsg & 0xffff00ffl) | (cmd32 << 8));
+#if (LOCAL_DEBUG==1)
+            printf("-->%d %lx %lx\n",MidiBuffer.ShortSize, cmd32, MidiBuffer.ShortMsg);
+#endif
+            if ((MidiBuffer.LastCmd & 0xe0) == 0xc0)
+            {
+               MidiBuffer.ShortSize=1;
+               return(MidiBuffer.ShortMsg);
+            }
+            MidiBuffer.ShortSize++;
+            break;
+         case 2:
+            MidiBuffer.ShortMsg = ((MidiBuffer.ShortMsg & 0xff00ffff) | (cmd32 << 16));
+#if (LOCAL_DEBUG==1)
+            printf("--->%d %lx %lx\n",MidiBuffer.ShortSize, cmd32, MidiBuffer.ShortMsg);
+#endif
+         	MidiBuffer.ShortSize = 0;
+            if (     ((MidiBuffer.LastCmd & 0x80) == 0x80) 
+                 ||  ((MidiBuffer.LastCmd       ) == 0xe0)
+               )
+            {
+               MidiBuffer.ShortSize=1;
+               return(MidiBuffer.ShortMsg);
+            }
+            MidiBuffer.ShortSize=1;
+         break;
+         default:
+         break;
+      }
+   }
+   return(0xffffffffl);
+}   
+#endif
+
+
+/* Falls Zeichen im Midi-Eingangspuffer Return 1, sonst Return 0 */
+char GetMidiByteReadyXX()
+{
+   if (ior->ibufhd == ior->ibuftl)
+   {
+      return(0);
+   }
+   else
+   {
+      return(1);
+   }
+}
+
+UINT8 GetMidiByteXX()
+{
+	unsigned char *ch1,mb;
+
+
+	while(ior->ibufhd == ior->ibuftl);
+
+	(ior->ibufhd)++;
+	if (ior->ibufhd == ior->ibufsiz)
+	{
+		ior->ibufhd=0;
+		ch1 = (unsigned char *) ior->ibuf;
+	}
+	else
+		ch1 = (unsigned char *) ior->ibuf + ior->ibufhd;
+
+	mb = *ch1;
+
+	gb[n++]=mb;
+	if (n >=200) n=0;
+/*	printf("Head:%d Tail:%d Char:0x%x\n",ior->ibufhd,ior->ibuftl,mb);
+*/
+	return(mb);
+}
+
+
+void InitMidi(void);
+void InitMidi(void)
+{
+	ior = Iorec(2);
+	ior->ibuftl = ior->ibufhd = 0;
+
+   MidiBuffer.sysexsize=0;
+   sysexvalid=0;
+   MidiBuffer.ShortMsg = 0xffffffffl;
+   MidiBuffer.ShortSize = 0;
+#if (LOCAL_DEBUG==1)
+   printf("InitMidi\n");
+#endif
+}
+

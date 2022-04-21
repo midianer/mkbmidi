@@ -1,0 +1,353 @@
+/*
+2003/06/20 neu formatiert, xxyy changes
+*/
+#include <stdio.h>
+
+#include "typedefs.h"
+#include "midi.h"
+
+
+PATCH_STR Patch_Prison1;
+
+
+
+/* -------- Prison ---------------------------------------------------- */
+
+struct t_song Prison;
+
+PERF_STR Perf_Prison;
+
+
+struct t_song Prison;
+struct t_splits Prison_Strings;
+struct t_splits Prison_Cello;
+struct t_splits *PrisonList[] = 
+{
+	&Prison_Strings, &Prison_Cello, NULL};
+
+
+struct t_song Prison={ "Prison",
+	0, 81,1,3,&PrisonList[0],NULL,
+    {
+       {	 NULL,0l},
+       {  &Patch_Prison1,0x02010000l},
+/*	&Patch_FeuSynth1, 0x2050000l,*/
+       {  NULL,0l},
+       {  NULL,0l},
+       {  NULL,0l},
+       {  NULL,0l},
+       {  NULL,0l},
+       {  NULL,0l},
+       {  NULL,0l},
+       {  NULL,0l}
+    },
+    {
+    { 1, 81,2,50,  Chan0},	/* Strings */
+    { 1, 81,1,94,  Chan1},	/* Flute */
+    { 1, 81,2,42,  Chan2},  /* Cello */
+    { 0, 81,0,0,   Chan3},
+    { 0, 81,0,0,   Chan4},
+    { 0, 81,0,0,   Chan5},
+    { 0, 81,0,0,   Chan6},
+    { 0, 81,0,0,   Chan7},
+    { 0, 81,0,0,   Chan8},
+    { 0, 81,0,0,   Chan9},
+    { 0, 81,0,0,   Chan10},
+    { 0, 81,0,0,   Chan11},
+    { 0, 81,0,0,   Chan12},
+    { 0, 81,0,0,   Chan13},
+    { 0, 81,0,0,   Chan14},
+    { 0, 81,0,0,   Chan15}
+    }
+};
+
+
+struct t_splits Prison_Strings={
+	NULL, SPLITVAL, ALLNOTES_OFF, FULL_PERFCOMMON,
+   {
+   { 1,   GIS4,C8,  0,  Chan0, 100, 0,VolCtr2,InChan0},
+   { 0,   A0,H2,   36,  Chan1, 127, 0,VolCtr2,InChan0},
+   { 1,   A0,G4,    0,  Chan2, 127, 0,VolCtr2,InChan0},
+   { 0,   0,127,    0,  Chan3, 127, 0,VolCtr2,InChan0},
+   { 0,   0,127,    0,  Chan4, 127, 0,VolCtr2,InChan0},
+   { 0,   0,127,    0,  Chan5, 127, 0,VolCtr2,InChan0},
+   { 0,   0,127,    0,  Chan6, 127, 0,VolCtr2,InChan0},
+   { 0,   0,127,    0,  Chan7, 127, 0,VolCtr2,InChan0},
+   { 0,   0,127,    0,  Chan8, 127, 0,VolCtr2,InChan0},
+   { 0,   0,127,    0,  Chan9, 127, 0,VolCtr2,InChan0},
+   { 0,   0,127,    0,  Chana, 127, 0,VolCtr2,InChan0},
+   { 0,   0,127,    0,  Chanb, 127, 0,VolCtr2,InChan0},
+   { 0,   0,127,    0,  Chanc, 127, 0,VolCtr2,InChan0},
+   { 0,   0,127,    0,  Chand, 127, 0,VolCtr2,InChan0},
+   { 0,   0,127,    0,  Chane, 127, 0,VolCtr2,InChan0},
+   { 0,   0,127,    0,  Chanf, 127, 0,VolCtr2,InChan0}
+   },
+   "CS"
+};
+
+struct t_splits Prison_Cello={
+	NULL, SPLITVAL, ALLNOTES_OFF, FULL_PERFCOMMON,
+   {
+    {0,   C3,C8,   12,  Chan0, 100, 0,VolCtr2,InChan0},
+    {0,   A0,H2,   36,  Chan1, 127, 0,VolCtr2,InChan0},
+    {1,   A0,C8,    0,  Chan2, 127, 0,VolCtr2,InChan0},
+    {0,   0,127,    0,  Chan3, 127, 0,VolCtr2,InChan0},
+    {0,   0,127,    0,  Chan4, 127, 0,VolCtr2,InChan0},
+    {0,   0,127,    0,  Chan5, 127, 0,VolCtr2,InChan0},
+    {0,   0,127,    0,  Chan6, 127, 0,VolCtr2,InChan0},
+    {0,   0,127,    0,  Chan7, 127, 0,VolCtr2,InChan0},
+    {0,   0,127,    0,  Chan8, 127, 0,VolCtr2,InChan0},
+    {0,   0,127,    0,  Chan9, 127, 0,VolCtr2,InChan0},
+    {0,   0,127,    0,  Chana, 127, 0,VolCtr2,InChan0},
+    {0,   0,127,    0,  Chanb, 127, 0,VolCtr2,InChan0},
+    {0,   0,127,    0,  Chanc, 127, 0,VolCtr2,InChan0},
+    {0,   0,127,    0,  Chand, 127, 0,VolCtr2,InChan0},
+    {0,   0,127,    0,  Chane, 127, 0,VolCtr2,InChan0},
+    {0,   0,127,    0,  Chanf, 127, 0,VolCtr2,InChan0}
+    },
+    "CS"
+ };
+
+
+PATCH_STR Patch_Prison1 = {
+/* Patch Common */
+0x03000000l, 0x00000048l,
+/*   NAME   */
+"JC Strat    ",
+
+{
+  10,  /* 12: EFXType------ */
+/* EFXParameter */
+ 15,  2,127,  5, 40, 20, 50,127,  0,  0,  0,  0,
+/*25-EFXOutAss----*/      0,    /*26-EFXOutLev----*/    127,    
+/*27-EFXChSendLev-*/    127,    /*28-EFXRevSendLev*/      0,    
+/*29-EFXCtrlS1----*/      9,    /*30-EFXCtrlD1----*/     46,    
+/*31-EFXCtrlS2----*/      0,    /*32-EFXCtrlD2----*/     63,    
+/*33-ChorLev------*/    127,    /*34-ChorRate-----*/      4,    
+/*35-ChorDepth----*/    127,    /*36-ChorPreDel---*/      0,    
+/*37-ChorFdback---*/      0,    /*38-ChorOutAss---*/      1,    
+/*39-RevType------*/      2,    /*40-RevLevel-----*/     77,    
+/*41-RevTime------*/    110,    /*42-RevHFDamp----*/     15,    
+/*43-RevFdback----*/      0,    /*44-DefTempo1----*/      6,    
+/*45-DefTempo2----*/      4,    /*46-PatchLevel---*/    127,    
+/*47-PatchPan-----*/     64,    /*48-AnalogFeel---*/      0,    
+/*49-BendRngUp----*/      2,    /*50-BendRngDown--*/      2,    
+/*51-KeyAssMode---*/      0,    /*52-SoloLegato---*/      0,    
+/*53-PortaSw------*/      0,    /*54-PortaMode----*/      1,    
+/*55-PortaType----*/      0,    /*56-PortaStart---*/      0,    
+/*57-PortaTime----*/     18,    /*58-PtchCtrlSrc2-*/      1,    
+/*59-PtchCtrlSrc3-*/      2,    /*60-EFXCtrl-H/P--*/      0,    
+/*61-Ctrl1-H/P----*/      0,    /*62-Ctrl2-H/P----*/      0,    
+/*63-Ctrl3-H/P----*/      0,    /*64-VelRangeSw---*/      1,    
+/*65-OctaveSh-----*/      3,    /*66-StrTuneDepth-*/      0,    
+/*67-VoicePrio----*/      0,    /*68-StructType1&2*/      0,    
+/*69-BoostLevel1&2*/      0,    /*70-StructType3&4*/      0,    
+/*71-BoostLevel3&4*/      0
+},   
+
+/* Patch Tone:  4 */
+{
+{0x03001000l, 0x00000101l},
+{0x03001200l, 0x00000101l},
+{0x03001400l, 0x00000101l},
+{0x03001600l, 0x00000101l}
+},
+
+{
+/*  ToneSW         0   0*/ {    1,    0,    0,    0},
+/*  WaveGrp        1   1*/ {    0,    0,    0,    0},
+/*  WaveGrpId      2   2*/ {    1,    1,    1,    1},
+/*  WaveNumber1    3   3*/ {    4,    4,    4,    4},
+/*  WaveNumber2    4   4*/ {   11,   10,   12,   13},
+/*  WaveGain       5   5*/ {    2,    2,    2,    2},
+/*  FXMswitch      6   6*/ {    0,    0,    0,    0},
+/*  FXMcolor       7   7*/ {    0,    0,    0,    0},
+/*  FXMdepth       8   8*/ {    0,    0,    0,    0},
+/*  ToneDelMode    9   9*/ {    0,    0,    0,    0},
+/*  ToneDelTime   10   a*/ {    0,    0,    0,    0},
+/*  VelCrossFade  11   b*/ {    0,    0,    0,    0},
+/*  VelRngLow     12   c*/ {    1,    1,    1,    1},
+/*  VelRngUp      13   d*/ {  127,  127,  127,  127},
+/*  KeyRngLow     14   e*/ {    0,    0,    0,    0},
+/*  KeyRngUp      15   f*/ {  127,  127,  127,  127},
+/*  RedamperSw    16  10*/ {    0,    0,    0,    0},
+/*  VolCtrlSw     17  11*/ {    1,    1,    1,    1},
+/*  Hold1CtrlSw   18  12*/ {    1,    1,    1,    1},
+/*  BendCtrlSw    19  13*/ {    1,    1,    1,    1},
+/*  PanCtrlSw     20  14*/ {    1,    1,    1,    1},
+/*  Ctrl1Dest1    21  15*/ {    9,    9,    9,    9},
+/*  Ctrl1Dpth1    22  16*/ {   71,   71,   71,   71},
+/*  Ctrl1Dest2    23  17*/ {    0,    0,    0,    0},
+/*  Ctrl1Dpth2    24  18*/ {   63,   63,   63,   63},
+/*  Ctrl1Dest3    25  19*/ {    0,    0,    0,    0},
+/*  Ctrl1Dpth3    26  1a*/ {   63,   63,   63,   63},
+/*  Ctrl1Dest4    27  1b*/ {    0,    0,    0,    0},
+/*  Ctrl1Dpth4    28  1c*/ {   63,   63,   63,   63},
+/*  Ctrl2Dest1    29  1d*/ {    9,    9,    9,    9},
+/*  Ctrl2Dpth1    30  1e*/ {   75,   75,   75,   75},
+/*  Ctrl2Dest2    31  1f*/ {    0,    0,    0,    0},
+/*  Ctrl2Dpth2    32  20*/ {   63,   63,   63,   63},
+/*  Ctrl2Dest3    33  21*/ {    0,    0,    0,    0},
+/*  Ctrl2Dpth3    34  22*/ {   63,   63,   63,   63},
+/*  Ctrl2Dest4    35  23*/ {    0,    0,    0,    0},
+/*  Ctrl2Dpth4    36  24*/ {   63,   63,   63,   63},
+/*  Ctrl3Dest1    37  25*/ {    4,    4,    4,    4},
+/*  Ctrl3Dpth1    38  26*/ {   84,   84,   84,   84},
+/*  Ctrl3Dest2    39  27*/ {    0,    0,    0,    0},
+/*  Ctrl3Dpth2    40  28*/ {   63,   63,   63,   63},
+/*  Ctrl3Dest3    41  29*/ {    0,    0,    0,    0},
+/*  Ctrl3Dpth3    42  2a*/ {   63,   63,   63,   63},
+/*  Ctrl3Dest4    43  2b*/ {    0,    0,    0,    0},
+/*  Ctrl1Dpth4    44  2c*/ {   63,   63,   63,   63},
+/*  LFO1WaveForm  45  2d*/ {    0,    0,    0,    0},
+/*  LFO1KeyTrig   46  2e*/ {    0,    0,    0,    0},
+/*  LFO1Rate      47  2f*/ {   92,   92,   92,   92},
+/*  LFO1LevOffs   48  30*/ {    2,    2,    2,    2},
+/*  LFO1DelTime   49  31*/ {    0,    0,    0,    0},
+/*  LFO1FadeMode  50  32*/ {    0,    0,    0,    0},
+/*  LFO1FadeTime  51  33*/ {    0,    0,    0,    0},
+/*  LFO1ExtSync   52  34*/ {    0,    0,    0,    0},
+/*  LFO2WaveForm  53  35*/ {    0,    0,    0,    0},
+/*  LFO2KeyTrig   54  36*/ {    0,    0,    0,    0},
+/*  LFO2Rate      55  37*/ {   80,   80,   80,   80},
+/*  LFO2LevOffs   56  38*/ {    2,    2,    2,    2},
+/*  LFO2DelTime   57  39*/ {    0,    0,    0,    0},
+/*  LFO2FadeMode  58  3a*/ {    0,    0,    0,    0},
+/*  LFO2FadeTime  59  3b*/ {    0,    0,    0,    0},
+/*  LFO2ExtSync   60  3c*/ {    0,    0,    0,    0},
+/*  PtchCoarseTn  61  3d*/ {   48,   48,   48,   48},
+/*  PtchFineTn    62  3e*/ {   50,   50,   50,   50},
+/*  PtchRndDepth  63  3f*/ {    0,    0,    0,    0},
+/*  PtchKeyFoll   64  40*/ {   12,   12,   12,   12},
+/*  PtchEnvDepth  65  41*/ {   12,   12,   12,   12},
+/*  PtchVelSens   66  42*/ {   50,   50,   50,   50},
+/*  PtchVelT1Sen  67  43*/ {    7,    7,    7,    7},
+/*  PtchVelT4Sen  68  44*/ {    7,    7,    7,    7},
+/*  PtchTimKeyFo  69  45*/ {    7,    7,    7,    7},
+/*  PtchTime1     70  46*/ {    0,    0,    0,    0},
+/*  PtchTime2     71  47*/ {    0,    0,    0,    0},
+/*  PtchTime3     72  48*/ {    0,    0,    0,    0},
+/*  PtchTime4     73  49*/ {    0,    0,    0,    0},
+/*  PtchLevel1    74  4a*/ {   63,   63,   63,   63},
+/*  PtchLevel2    75  4b*/ {   63,   63,   63,   63},
+/*  PtchLevel3    76  4c*/ {   63,   63,   63,   63},
+/*  PtchLevel4    77  4d*/ {   63,   63,   63,   63},
+/*  PtchLFO1Dpth  78  4e*/ {   63,   63,   63,   63},
+/*  PtchLFO2Dpth  79  4f*/ {   63,   63,   63,   63},
+/*  FltType       80  50*/ {    1,    1,    1,    1},
+/*  FltCutoffFrq  81  51*/ {   67,   67,   67,   67},
+/*  FltCutoffFol  82  52*/ {    9,    9,    9,    9},
+/*  FltResonance  83  53*/ {    0,    0,    0,    0},
+/*  FltResVelSns  84  54*/ {   50,   50,   50,   50},
+/*  FltEnvDepth   85  55*/ {   93,   93,   93,   93},
+/*  FltEnvVelCur  86  56*/ {    0,    0,    0,    0},
+/*  FltEnvVelSns  87  57*/ {  109,  109,  109,  109},
+/*  FltEnvVelT1   88  58*/ {    7,    7,    7,    7},
+/*  FltEnvVelT4   89  59*/ {    7,    7,    7,    7},
+/*  FltEnvTKeyFl  90  5a*/ {    7,    7,    7,    7},
+/*  FltTime1      91  5b*/ {    0,    0,    0,    0},
+/*  FltTime2      92  5c*/ {   30,   30,   30,   30},
+/*  FltTime3      93  5d*/ {   67,   67,   67,   67},
+/*  FltTime4      94  5e*/ {   53,   53,   53,   53},
+/*  FltLevel1     95  5f*/ {  127,  127,  127,  127},
+/*  FltLevel2     96  60*/ {   80,   80,   80,   80},
+/*  FltLevel3     97  61*/ {    0,    0,    0,    0},
+/*  FltLevel4     98  62*/ {    0,    0,    0,    0},
+/*  FltLFO1Depth  99  63*/ {   63,   63,   63,   63},
+/*  FltLFO2Depth 100  64*/ {   63,   63,   63,   63},
+/*  ToneLevel    101  65*/ {  127,  127,  127,  127},
+/*  BiasDirect   102  66*/ {    0,    0,    0,    0},
+/*  BiasPoint    103  67*/ {   60,   60,   60,   60},
+/*  BiasLevel    104  68*/ {    7,    7,    7,    7},
+/*  A-EnvVelCurv 105  69*/ {    0,    0,    0,    0},
+/*  A-EnvVelSens 106  6a*/ {   88,   88,   88,   88},
+/*  A-EnvT1Sens  107  6b*/ {    7,    7,    7,    7},
+/*  A-EnvT4Sens  108  6c*/ {    7,    7,    7,    7},
+/*  A-EnvTKeyFol 109  6d*/ {    7,    7,    7,    7},
+/*  A-EnvTime1   110  6e*/ {    0,    0,    0,    0},
+/*  A-EnvTime2   111  6f*/ {   40,   40,   40,   40},
+/*  A-EnvTime3   112  70*/ {  100,  100,  100,  100},
+/*  A-EnvTime4   113  71*/ {   20,   20,   20,   20},
+/*  A-EnvLevel1  114  72*/ {  127,  127,  127,  127},
+/*  A-EnvLevel2  115  73*/ {  127,  127,  127,  127},
+/*  A-EnvLevel3  116  74*/ {  127,  127,  127,  127},
+/*  AmplLFO1Dpth 117  75*/ {   63,   63,   63,   63},
+/*  AmplLFO2Dpth 118  76*/ {   63,   63,   63,   63},
+/*  TonePan      119  77*/ {   64,   64,   64,   64},
+/*  PanKeyFollow 120  78*/ {    7,    7,    7,    7},
+/*  PanRndDepth  121  79*/ {    0,    0,    0,    0},
+/*  PanAltDepth  122  7a*/ {   64,   64,   64,   64},
+/*  PanLFO1Depth 123  7b*/ {   63,   63,   63,   63},
+/*  PanLFO2Depth 124  7c*/ {   63,   63,   63,   63},
+/*  OutAssign    125  7d*/ {    1,    1,    1,    1},
+/*  OutLevel     126  7e*/ {  127,  127,  127,  127},
+/*  ChSendLevel  127  7f*/ {    0,    0,    0,    0},
+/*  RevSendLevel 128  80*/ {    0,    0,    0,    0}
+},
+};
+
+
+
+t_splits_jv1080 Prison_Strings_Split={
+	"Strings", NULL, SPLITVAL, ALLNOTES_OFF, FULL_PERFCOMMON,
+   {
+   { 1,  InChan0, 0, 0, "NoName", GIS4,C8,  0,  Chan0, 100, 0,VolCtr1, ModulationOff, 0, MNUMBER_JV1080_SPLIT},
+   { 0,  InChan0, 0, 0, "NoName", A0,H2,   36,  Chan1, 127, 0,VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT},
+   { 1,  InChan0, 0, 0, "NoName", A0,G4,    0,  Chan2, 127, 0,VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT},
+   { 0,  InChan0, 0, 0, "NoName", 0,127,    0,  Chan3, 127, 0,VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT},
+   { 0,  InChan0, 0, 0, "NoName", 0,127,    0,  Chan4, 127, 0,VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT},
+   { 0,  InChan0, 0, 0, "NoName", 0,127,    0,  Chan5, 127, 0,VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT},
+   { 0,  InChan0, 0, 0, "NoName", 0,127,    0,  Chan6, 127, 0,VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT},
+   { 0,  InChan0, 0, 0, "NoName", 0,127,    0,  Chan7, 127, 0,VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT},
+   { 0,  InChan0, 0, 0, "NoName", 0,127,    0,  Chan8, 127, 0,VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT},
+   { 0,  InChan0, 0, 0, "NoName", 0,127,    0,  Chan9, 127, 0,VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT},
+   { 0,  InChan0, 0, 0, "NoName", 0,127,    0,  Chana, 127, 0,VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT},
+   { 0,  InChan0, 0, 0, "NoName", 0,127,    0,  Chanb, 127, 0,VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT},
+   { 0,  InChan0, 0, 0, "NoName", 0,127,    0,  Chanc, 127, 0,VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT},
+   { 0,  InChan0, 0, 0, "NoName", 0,127,    0,  Chand, 127, 0,VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT},
+   { 0,  InChan0, 0, 0, "NoName", 0,127,    0,  Chane, 127, 0,VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT},
+   { 0,  InChan0, 0, 0, "NoName", 0,127,    0,  Chanf, 127, 0,VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT}
+   },
+   MNUMBER_JV1080_SPLITS
+};
+
+t_splits_jv1080 Prison_Cello_Split={
+	"Cello", NULL, SPLITVAL, ALLNOTES_OFF, FULL_PERFCOMMON,
+   {
+      { 0, InChan0, 0, 0, "NoName", C3,C8,   12,  Chan0, 100, 0, VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT },
+      { 0, InChan0, 0, 0, "NoName", A0,H2,   36,  Chan1, 127, 0, VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT },
+      { 1, InChan0, 0, 0, "NoName", A0,C8,    0,  Chan2, 127, 0, VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT },
+      { 0, InChan0, 0, 0, "NoName", 0,127,    0,  Chan3, 127, 0, VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT },
+      { 0, InChan0, 0, 0, "NoName", 0,127,    0,  Chan4, 127, 0, VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT },
+      { 0, InChan0, 0, 0, "NoName", 0,127,    0,  Chan5, 127, 0, VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT },
+      { 0, InChan0, 0, 0, "NoName", 0,127,    0,  Chan6, 127, 0, VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT },
+      { 0, InChan0, 0, 0, "NoName", 0,127,    0,  Chan7, 127, 0, VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT },
+      { 0, InChan0, 0, 0, "NoName", 0,127,    0,  Chan8, 127, 0, VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT },
+      { 0, InChan0, 0, 0, "NoName", 0,127,    0,  Chan9, 127, 0, VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT },
+      { 0, InChan0, 0, 0, "NoName", 0,127,    0,  Chana, 127, 0, VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT },
+      { 0, InChan0, 0, 0, "NoName", 0,127,    0,  Chanb, 127, 0, VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT },
+      { 0, InChan0, 0, 0, "NoName", 0,127,    0,  Chanc, 127, 0, VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT },
+      { 0, InChan0, 0, 0, "NoName", 0,127,    0,  Chand, 127, 0, VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT },
+      { 0, InChan0, 0, 0, "NoName", 0,127,    0,  Chane, 127, 0, VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT },
+      { 0, InChan0, 0, 0, "NoName", 0,127,    0,  Chanf, 127, 0, VolCtr2, ModulationOff, 0, MNUMBER_JV1080_SPLIT }
+    },
+   MNUMBER_JV1080_SPLITS
+   };
+
+t_instrument Prison_xxyyList[] = 
+{
+   {  1, (t_splits_jv1080 *)&Prison_Strings_Split,  (t_splits_jx8p *)NULL , (t_splits_z4 *)NULL },
+   {  1, (t_splits_jv1080 *)&Prison_Cello_Split  ,  (t_splits_jx8p *)NULL , (t_splits_z4 *)NULL },
+   {  0, (t_splits_jv1080 *)NULL                 , (t_splits_jx8p *)NULL , (t_splits_z4 *)NULL },
+};
+
+t_song_xxyy Prison_xxyySong = { 
+   "Prison",
+   "Prison",
+   (t_instrument*)&Prison_xxyyList,
+   { 30 }, { 0xffffffffUL }, { 0xffffffffUL }, 
+};
+
+
+/* ENDE  Prison */
+
