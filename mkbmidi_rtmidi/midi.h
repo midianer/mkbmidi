@@ -1,3 +1,5 @@
+#ifndef __MIDI_H
+#define __MIDI_H
 
 /* -------------------------------------------------------------------- */
 /*       Typendefinition.                                               */
@@ -9,11 +11,12 @@
 
 #include <inttypes.h>
 
-extern void Midiws(UINT32 len, UINT8 *data);
+void Midiws(UINT32 len, UINT8 *data);
+void MidiMSG_Send(uint16_t len, uint8_t * midi_msg);
+uint32_t  MidiShortMSG_Get(uint8_t * ptr);
+void MidiShortMSG_Send( UINT32 MidiMsg );
+UINT32 MidiLongMSG_Get(UINT8 *SysExBuffer);
 extern void MidiLongMSG_Send(UINT8  *sysexbuffer, int len);
-extern uint32_t  MidiShortMSG_Get(uint8_t * ptr);
-extern void MidiShortMSG_Send( UINT32 MidiMsg );
-extern UINT32 MidiLongMSG_Get(UINT8 *SysExBuffer);
 extern void InitMidi();
 extern void CloseMidi();
 char GetMidiByteReady(void);
@@ -154,3 +157,5 @@ char TonNames[][5]={
 #define	Chand  13
 #define	Chane  14
 #define	Chanf  15
+
+#endif  // __MIDI_H

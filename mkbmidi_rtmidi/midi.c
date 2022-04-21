@@ -14,22 +14,7 @@
 #include <inttypes.h>
 #include "typedefs.h"
 #include "rtmidi_wrp.h"
-#include <sys/ioctl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <errno.h>
-#include <termios.h>
-#include <linux/serial.h>
-#include <linux/ioctl.h>
-#include <asm/ioctls.h>
-
-   
-static int fd=0;   
-struct termios oldtio, newtio;
-
-
+#include "midi.h"
 
 /* -------------------------------------------------------------------- */
 /*       Typendefinition.                                               */
@@ -274,49 +259,28 @@ void InitMidi_p(void)
 //};
 
 
-void MidiMSG_Send(uint16_t len, uint8_t * ptr);
-void MidiMSG_Send(uint16_t len, uint8_t * ptr) {
-}
-
-void Midiws(UINT32 len, UINT8 *data);
-void Midiws(UINT32 len, UINT8 *data)
-{
-}
-
 
 void InitMidi();
 void InitMidi()
 {
    RtMidiInit();
-   int rty_cnt=3;
-   do
-   {
-      fd = open("/dev/snd/midiC1D0", O_RDWR|O_NONBLOCK);
-      if (fd >= 0)
-      {
-         printf("opened /dev/snd/midiC1D0\n");
-         return;
-      }
-      fd = open("/dev/snd/midiC3D0", O_RDWR|O_NONBLOCK);
-      if (fd >= 0)
-      {
-         printf("opened /dev/snd/midiC3D0\n");
-         return;
-      }
-      printf("cannot open /dev/snd/midiCxD0, %d\n", rty_cnt);
-      rty_cnt--;
-      sleep(1);
-   }
-   while (rty_cnt > 0);
 }
 
 void CloseMidi();
 void CloseMidi()
 {
-   RtMidiClose();
+  RtMidiClose();
 }
 
-void MidiShortMSG_Send( UINT32 MidiMsg );
+void MidiMSG_Send(uint16_t len, uint8_t * midi_msg) {
+  RtMidiSendMessage(len, midi_msg);
+}
+
+void Midiws(UINT32 len, UINT8 *data)
+{
+  RtMidiSendMessage(len+1, data);
+}
+
 void MidiShortMSG_Send( UINT32 MidiMsg )
 {
    uint8_t imbuf[3];
@@ -341,23 +305,11 @@ void MidiShortMSG_Send( UINT32 MidiMsg )
      default:
         return;
    }
-   //printf("MidiShortMSG_Send 0x%02x %d\n", imbuf[0], len);
-   write(fd, imbuf, len);
-   //close(fd);
+   printf("MidiShortMSG_Send 0x%02x %d\n", imbuf[0], len);
+   MidiMSG_Send(len, imbuf);
   return;
 }
-/*
-UINT32  MidiShortMSG_Get();
-UINT32  MidiShortMSG_Get()
-{
-   uint32_t msg;
 
-   msg = midistmgetmsg(fd);
-   return msg;
-}
-*/
-
-uint32_t  MidiShortMSG_Get(uint8_t * ptr);
 uint32_t  MidiShortMSG_Get(uint8_t * ptr)
 {
    int len = RtMidiGetMessage(ptr);
@@ -377,7 +329,6 @@ void MidiLongMSG_Send(UINT8  *sysexbuffer, int len)
    //close(fd);
 }
 
-UINT32  MidiLongMSG_Get(UINT8 *SysExBuffer);
 UINT32  MidiLongMSG_Get(UINT8 *SysExBuffer)
 {
 return 0;

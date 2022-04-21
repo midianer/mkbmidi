@@ -1,3 +1,6 @@
+archive/
+mkbmidi_rtmidi/build/
+rtmidi/
 .metadata/
 
 */Debug

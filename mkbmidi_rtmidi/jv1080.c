@@ -1,6 +1,7 @@
 #include "config.h"
 #include <stdio.h>
 #include <string.h>
+#include <inttypes.h>
 #if (MACHINE==ATARI)
    #include <tos.h>
    #include <ext.h>
@@ -729,7 +730,7 @@ void Send1040Msg(char *txt)
 	ms[6]=(adr >> 16) & 0x7f;
 	ms[7]=(adr >> 8)  & 0x7f;
 	ms[8]= adr & 0x7f;
-	sprintf(&ms[9],text);
+	strcpy((char*)&ms[9], text);
 	for(cs=0,i=5;i<21;i++)
 		cs+=ms[i];
 	ms[21]=(128- (cs & 0x7f)) & 0x7f;
@@ -754,7 +755,7 @@ void Send1040Msg(char *txt)
 	ms[6]=(adr >> 16) & 0x7f;
 	ms[7]=(adr >> 8)  & 0x7f;
 	ms[8]= adr & 0x7f;
-	sprintf(&ms[9],text);
+	strcpy(&ms[9],text); // TODO check strcpy!!
 	for(cs=0,i=5;i<21;i++)
 		cs+=ms[i];
 	ms[21]=(128- (cs & 0x7f)) & 0x7f;
@@ -1380,7 +1381,7 @@ int Get1080AllPerfData()
    #define PATCH_SIZE 128
    
 	int i,j,k,erg; 
-   unsigned long bank;
+   uint16_t bank;
    unsigned char buff[200];
 	FILE *fp;
 
